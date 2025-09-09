@@ -33,7 +33,9 @@ if (!require("org.At.tair.db")) BiocManager::install("org.At.tair.db")
 if (!require("AnnotationDbi")) BiocManager::install("AnnotationDbi")
 if (!require("circlize")) BiocManager::install("circlize")
 
-##-Directory-Structure
+---
+
+## Directory Structure
 ├── data/                # Input data files
 │   ├── Human_protein.xlsx
 │   ├── Mouse_protein.xlsx
@@ -44,6 +46,8 @@ if (!require("circlize")) BiocManager::install("circlize")
 │   ├── Arabidopsis_GO_CC_MF_result.xlsx
 ├── scripts/             # R scripts or Rmd files
 ├── README.md            # This file
+
+---
 
 ## Data Preparation
 Place all input Excel files in the data/ folder.
@@ -60,6 +64,8 @@ Word cloud: column elements containing text strings
 
 Example datasets are provided in the supplementary materials corresponding to each figure.
 Analysis Scripts
+
+---
 
 ## Analysis Scripts
 GO Enrichment Analysis (Human, Mouse, Arabidopsis):
@@ -101,11 +107,15 @@ Outputs PDF figure.
 All scripts are designed to read input from data/ and save outputs in results/.
 Outputs
 
+---
+
 ## Outputs
 
 Excel summary files (results/*.xlsx)
 
 PDF figures for GO enrichment, pie charts, chord diagrams, and word clouds (results/*.pdf)
+
+---
 
 ## Citation / References
 
