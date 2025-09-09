@@ -117,7 +117,7 @@ PDF figures for GO enrichment, pie charts, chord diagrams, and word clouds (resu
 
 ---
 
-## Citation / References
+## References
 
 Yu, G., Wang, L.G., Han, Y., et al. (2012). clusterProfiler: An R Package for Comparing Biological Themes among Gene Clusters. OMICS: A Journal of Integrative Biology, 16(5), 284-287. DOI: 10.1089/omi.2011.0118
 
