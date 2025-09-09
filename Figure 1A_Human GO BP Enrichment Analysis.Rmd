@@ -56,14 +56,15 @@ ego_simpl <- simplify(ego,
 barplot(ego_simpl, showCategory = 20, title = "Human GO Biological Process")
 
 # Export results to Excel
-write.xlsx(as.data.frame(ego_simpl), "data/human_GO_result.xlsx")
+write.xlsx(as.data.frame(ego_simpl), "results/human_GO_result.xlsx")
 
 # Export barplot to PDF
-pdf("data/Human_GO_BP_barplot.pdf", width = 12, height = 10)
+pdf("results/Human_GO_BP_barplot.pdf", width = 12, height = 10)
 barplot(ego_simpl, showCategory = 30, title = "Top 30 GO BP Terms (Human)")
 dev.off()
 
 # Export dotplot to PDF
-pdf("data/Human_GO_BP_dotplot.pdf", width = 12, height = 10)
+pdf("results/Human_GO_BP_dotplot.pdf", width = 12, height = 10)
 dotplot(ego_simpl, showCategory = 30, title = "Top 30 GO BP Terms (Human)")
 dev.off()
+
