@@ -33,7 +33,7 @@ if (!require("org.At.tair.db")) BiocManager::install("org.At.tair.db")
 if (!require("AnnotationDbi")) BiocManager::install("AnnotationDbi")
 if (!require("circlize")) BiocManager::install("circlize")
 
-## Directory Structure
+##-Directory-Structure
 ├── data/                # Input data files
 │   ├── Human_protein.xlsx
 │   ├── Mouse_protein.xlsx
