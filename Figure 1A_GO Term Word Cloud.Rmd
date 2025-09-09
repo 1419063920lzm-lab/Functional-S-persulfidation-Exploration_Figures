@@ -1,0 +1,60 @@
+---
+title: "GO Term Word Cloud"
+author: "Yaqian Huang, Zongmin Li, Hongfang Jin"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Install missing packages automatically
+if (!require("readxl")) install.packages("readxl")
+if (!require("wordcloud")) install.packages("wordcloud")
+if (!require("RColorBrewer")) install.packages("RColorBrewer")
+if (!require("tm")) install.packages("tm")
+
+# Load required libraries
+library(readxl)
+library(wordcloud)
+library(RColorBrewer)
+library(tm)
+
+# Create results directory if not exists
+if (!dir.exists("results")) dir.create("results")
+# Read Excel file from data/ folder
+# Expecting a column named "elements"
+go_data <- read_excel("data/elements.xlsx")
+
+# Preview the first few rows
+head(go_data$elements)
+# Merge all elements into a single text string and convert to lowercase
+go_text <- tolower(paste(go_data$elements, collapse = " "))
+
+# Build corpus and clean text (remove punctuation, numbers, stopwords)
+go_corpus <- Corpus(VectorSource(go_text))
+go_corpus <- tm_map(go_corpus, removePunctuation)
+go_corpus <- tm_map(go_corpus, removeNumbers)
+go_corpus <- tm_map(go_corpus, removeWords, stopwords("english"))
+
+# Convert to term-document matrix
+tdm <- TermDocumentMatrix(go_corpus)
+matrix <- as.matrix(tdm)
+
+# Build frequency dataframe
+word_freq <- sort(rowSums(matrix), decreasing = TRUE)
+df <- data.frame(word = names(word_freq), freq = word_freq)
+
+# Preview word frequency table
+head(df, 10)
+# Export word cloud to PDF in results/ folder
+pdf("results/wordcloud.pdf", width = 8, height = 6)
+
+wordcloud(words = df$word,
+          freq = df$freq,
+          min.freq = 2,
+          max.words = 100,
+          random.order = FALSE,
+          rot.per = 0.3,
+          scale = c(4, 0.5),
+          colors = brewer.pal(8, "Dark2"))
+
+dev.off()

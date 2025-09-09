@@ -1,0 +1,72 @@
+---
+title: "Pie Chart Contribution Analysis"
+author: "Yaqian Huang, Zongmin Li, Hongfang Jin"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Load required packages
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Create results directory if not exists
+if (!dir.exists("results")) dir.create("results")
+# Read Excel file from data/ folder
+# Note: col_names = FALSE because the first row contains headers
+df <- read_excel("data/elements.xlsx", col_names = FALSE)
+
+# Use the first row as column names
+colnames(df) <- df[1, ]
+df <- df[-1, ]  # Remove the first row (now header)
+
+# Inspect the data structure
+head(df)
+# Assume the first column is "Union" and the rest are subsets
+subsets <- colnames(df)[-1]
+
+# Convert to long format
+long_df <- df %>%
+  pivot_longer(
+    cols = all_of(subsets),
+    names_to = "Set",
+    values_to = "Element"
+  ) %>%
+  filter(!is.na(Element))
+
+# Count how many sets each element belongs to
+element_counts <- long_df %>%
+  group_by(Element) %>%
+  summarise(NumSets = n(), .groups = "drop")
+
+# Distribute contribution evenly across sets
+long_df <- long_df %>%
+  left_join(element_counts, by = "Element") %>%
+  mutate(Contribution = 1 / NumSets)
+
+# Summarize contribution by set
+contribution_df <- long_df %>%
+  group_by(Set) %>%
+  summarise(TotalContribution = sum(Contribution), .groups = "drop") %>%
+  mutate(Percentage = TotalContribution / sum(TotalContribution) * 100)
+
+# Show summary table
+contribution_df
+# Create a pie chart
+p <- ggplot(contribution_df, aes(x = "", y = Percentage, fill = Set)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Pie Chart Contribution") +
+  theme_void() +
+  geom_text(
+    aes(label = paste0(round(Percentage, 1), "%")),
+    position = position_stack(vjust = 0.5)
+  )
+
+# Print plot in RStudio
+p
+
+# Save plot to PDF in results/ folder
+ggsave("results/pie_chart.pdf", plot = p, width = 6, height = 6)
