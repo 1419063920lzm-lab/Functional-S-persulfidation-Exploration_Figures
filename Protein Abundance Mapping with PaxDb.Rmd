@@ -1,0 +1,92 @@
+---
+title: "Protein Abundance Mapping with PaxDb"
+author: "Yaqian Huang, Zongmin Li, Hongfang Jin"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Load required libraries
+library(readxl)
+library(openxlsx)
+library(biomaRt)
+library(dplyr)
+
+# Create results folder if not exists
+if (!dir.exists("results")) dir.create("results")
+# Step 1: Read UniProt protein list (column name should be 'uniprot_id')
+protein_list_human <- read_excel("data/protein_list.xlsx")
+
+# Step 2: Map UniProt ID to Ensembl Protein ID
+ensembl_human <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+
+mapping_human <- getBM(
+  attributes = c("uniprotswissprot", "ensembl_peptide_id", "external_gene_name"),
+  filters = "uniprotswissprot",
+  values = protein_list_human$uniprot_id,
+  mart = ensembl_human
+)
+
+# Add PaxDb ID format (prefix "9606.")
+mapping_human <- mapping_human %>%
+  mutate(paxdb_id = paste0("9606.", ensembl_peptide_id))
+
+# Step 3: Read PaxDb data
+paxdb_human <- read_excel("data/PaxDb_Human.xlsx")
+colnames(paxdb_human) <- c("paxdb_id", "abundance")
+
+# Step 4: Match PaxDb abundance
+matched_human <- mapping_human %>%
+  left_join(paxdb_human, by = "paxdb_id") %>%
+  select(uniprot_id = uniprotswissprot, gene_name = external_gene_name,
+         ensembl_peptide_id, abundance)
+
+# Step 5: Save results
+write.xlsx(matched_human, file = "results/matched_human_protein_abundance.xlsx", asTable = TRUE)
+
+# Step 1: Read UniProt protein list (column name should be 'uniprot_id')
+protein_list_mouse <- read_excel("data/protein_list_mouse.xlsx")
+
+# Step 2: Map UniProt ID to Ensembl Protein ID (mouse dataset)
+ensembl_mouse <- useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+
+mapping_mouse <- getBM(
+  attributes = c("uniprotswissprot", "ensembl_peptide_id", "external_gene_name"),
+  filters = "uniprotswissprot",
+  values = protein_list_mouse$uniprot_id,
+  mart = ensembl_mouse
+)
+
+# Add PaxDb ID format (prefix "10090.")
+mapping_mouse <- mapping_mouse %>%
+  mutate(paxdb_id = paste0("10090.", ensembl_peptide_id))
+
+# Step 3: Read PaxDb mouse data
+paxdb_mouse <- read_excel("data/PaxDb_Mouse.xlsx")
+
+# Step 4: Match PaxDb abundance
+matched_mouse <- mapping_mouse %>%
+  left_join(paxdb_mouse, by = "paxdb_id") %>%
+  select(uniprot_id = uniprotswissprot, gene_name = external_gene_name,
+         ensembl_peptide_id, abundance)
+
+# Step 5: Save results
+write.xlsx(matched_mouse, file = "results/matched_mouse_protein_abundance.xlsx", asTable = TRUE)
+
+# Step 1: Read Arabidopsis gene IDs (e.g. AT1G01050)
+protein_list_arabidopsis <- read_excel("data/protein_list_arabidopsis.xlsx")
+
+# Step 2: Construct PaxDb ID format (default isoform ".1")
+protein_list_arabidopsis <- protein_list_arabidopsis %>%
+  mutate(paxdb_id = paste0("3702.", uniprot_id, ".1"))
+
+# Step 3: Read PaxDb Arabidopsis data
+paxdb_arabidopsis <- read_excel("data/PaxDb_thaliana.xlsx")
+
+# Step 4: Match abundance
+matched_arabidopsis <- protein_list_arabidopsis %>%
+  left_join(paxdb_arabidopsis, by = "paxdb_id") %>%
+  select(tair_id = uniprot_id, paxdb_id, abundance)
+
+# Step 5: Save results
+write.xlsx(matched_arabidopsis, file = "results/matched_arabidopsis_protein_abundance.xlsx", asTable = TRUE)
