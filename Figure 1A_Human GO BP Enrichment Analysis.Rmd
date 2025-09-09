@@ -1,0 +1,69 @@
+---
+title: "Figure 1A: Human GO BP Enrichment Analysis"
+author: "Yaqian Huang, Zongmin Li, Hongfang Jin"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Figure 1A: Human GO Biological Process Enrichment
+
+This R Markdown file reproduces the GO BP enrichment analysis for Figure 1A of the manuscript.
+
+```{r setup, include=FALSE}
+# Global chunk options
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+# Load necessary R packages
+library(readxl)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(AnnotationDbi)
+library(openxlsx)
+# Read the Excel file (update the path as needed)
+gene_data <- read_excel("data/Human_protein.xlsx")
+
+# Extract Uniprot ID vector
+genes <- gene_data$uniprot_id
+gene_entrez <- AnnotationDbi::select(org.Hs.eg.db,
+                                     keys = genes,
+                                     keytype = "UNIPROT",
+                                     columns = c("ENTREZID"))
+
+# Remove NAs and duplicates
+gene_entrez <- gene_entrez[!is.na(gene_entrez$ENTREZID), ]
+entrez_ids <- unique(gene_entrez$ENTREZID)
+
+# Print mapping summary
+cat("Number of input genes:", length(genes), "\n")
+cat("Number of successfully mapped ENTREZ IDs:", length(entrez_ids), "\n")
+ego <- enrichGO(gene          = entrez_ids,
+                OrgDb         = org.Hs.eg.db,
+                keyType       = "ENTREZID",
+                ont           = "BP",
+                pAdjustMethod = "BH",
+                pvalueCutoff  = 0.05,
+                qvalueCutoff  = 0.2,
+                minGSSize     = 10,
+                maxGSSize     = 2000,
+                readable      = TRUE)
+
+# Simplify redundant GO terms
+ego_simpl <- simplify(ego,
+                      cutoff     = 0.7,        # similarity threshold
+                      by         = "p.adjust", # retain terms with smaller adjusted p-value
+                      select_fun = min,
+                      measure    = "Wang")
+# Barplot of GO results
+barplot(ego_simpl, showCategory = 20, title = "Human GO Biological Process")
+
+# Export results to Excel
+write.xlsx(as.data.frame(ego_simpl), "data/human_GO_result.xlsx")
+
+# Export barplot to PDF
+pdf("data/Human_GO_BP_barplot.pdf", width = 12, height = 10)
+barplot(ego_simpl, showCategory = 30, title = "Top 30 GO BP Terms (Human)")
+dev.off()
+
+# Export dotplot to PDF
+pdf("data/Human_GO_BP_dotplot.pdf", width = 12, height = 10)
+dotplot(ego_simpl, showCategory = 30, title = "Top 30 GO BP Terms (Human)")
+dev.off()
