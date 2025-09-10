@@ -1,134 +1,89 @@
 # Functional-S-persulfidation-Exploration_Figures
 Code and data for reproducing Figures 1 and 2 in our manuscript "Functional S-persulfidation Exploration Reveals a Novel Regulatory Mechanism of HNF1α"
-# Multi-Omics Data Analysis and Visualization
+Multi-Omics Data Analysis and Visualization
 
-This repository contains R scripts for comprehensive multi-omics data analysis, including GO enrichment, proteomics PaxDb mapping, pie chart visualization, chord diagram, and word cloud generation. All analyses use input data stored in the `data/` folder and produce outputs in the `results/` folder.
+This repository contains R scripts for comprehensive multi-omics data analysis, including GO enrichment, proteomics PaxDb mapping, pie chart visualization, chord diagram, and word cloud generation.
+All analyses use input data stored in the data/ folder and produce outputs in the results/ folder.
 
----
+Table of Contents
 
-## Table of Contents
+Environment Requirements
 
-1. [Environment Requirements](#environment-requirements)  
-2. [Directory Structure](#directory-structure)  
-3. [Data Preparation](#data-preparation)  
-4. [Analysis Scripts](#analysis-scripts)  
-5. [Outputs](#outputs)  
-6. [Citation / References](#citation--references)
+Directory Structure
 
----
+Data Preparation
 
-## Environment Requirements
+Analysis Scripts
+
+Outputs
+
+Citations and References
+
+Environment Requirements
 
 The analyses require R ≥ 4.3 and the following R packages:
 
-```r
 # Core packages
-install.packages(c("readxl", "openxlsx", "dplyr", "tidyr", "ggplot2", "RColorBrewer", "wordcloud", "tm", "biomaRt"))
+install.packages(c("readxl", "openxlsx", "dplyr", "tidyr", "ggplot2", 
+                   "RColorBrewer", "wordcloud", "tm", "biomaRt"))
 
 # Bioconductor packages
-if (!require("clusterProfiler")) BiocManager::install("clusterProfiler")
-if (!require("org.Hs.eg.db")) BiocManager::install("org.Hs.eg.db")
-if (!require("org.Mm.eg.db")) BiocManager::install("org.Mm.eg.db")
-if (!require("org.At.tair.db")) BiocManager::install("org.At.tair.db")
-if (!require("AnnotationDbi")) BiocManager::install("AnnotationDbi")
-if (!require("circlize")) BiocManager::install("circlize")
+if (!require("BiocManager")) install.packages("BiocManager")
+BiocManager::install(c("clusterProfiler", "org.Hs.eg.db", "org.Mm.eg.db", 
+                       "org.At.tair.db", "AnnotationDbi", "circlize"))
 
----
+Directory Structure
 
-## Directory Structure
-├── data/                # Input data files
-│   ├── Human_protein.xlsx
-│   ├── Mouse_protein.xlsx
-│   ├── Arabidopsis_protein.xlsx
-├── results/             # Output files (Excel, PDF, figures)
-│   ├── Human_GO_CC_MF_result.xlsx
-│   ├── Mouse_GO_BP_result.xlsx
-│   ├── Arabidopsis_GO_CC_MF_result.xlsx
-├── scripts/             # R scripts or Rmd files
-├── README.md            # This file
+The repository is organized as follows:
 
----
+├── data/             # Input data files (Excel, CSV, etc.)
+├── results/          # Output results (PDFs, plots, tables)
+├── scripts/          # R Markdown (.Rmd) analysis scripts
+├── README.md         # Project documentation
 
-## Data Preparation
-Place all input Excel files in the data/ folder.
+Data Preparation
 
-Ensure column names match those expected in each script:
+All input data must be placed in the data/ folder.
 
-GO enrichment: uniprot_id (Human/Mouse) or TAIR (Arabidopsis)
+Example datasets are provided in supplementary materials for each figure.
 
-PaxDb mapping: uniprot_id for proteins
+Ensure that column names match the expected format in the scripts (see comments in each .Rmd).
 
-Chord diagram: first column is AC_site, subsequent columns are organs
-
-Word cloud: column elements containing text strings
-
-Example datasets are provided in the supplementary materials corresponding to each figure.
 Analysis Scripts
 
----
+The main analysis scripts are provided as .Rmd files under scripts/:
 
-## Analysis Scripts
-GO Enrichment Analysis (Human, Mouse, Arabidopsis):
+GO Enrichment Analysis
+Performs GO enrichment for human, mouse, and Arabidopsis datasets using clusterProfiler.
 
-Uses clusterProfiler and organism-specific annotation packages.
+Proteomics PaxDb Mapping
+Maps protein abundance information from PaxDb and visualizes distributions.
 
-Supports Cellular Component (CC), Molecular Function (MF), and Biological Process (BP).
+Pie Chart Visualization
+Summarizes functional categories as proportions.
 
-Produces Excel tables and PDF barplots/dotplots.
+Chord Diagram
+Compares organ-specific protein oxidation differences and visualizes using circlize.
 
-PaxDb Protein Abundance Mapping:
+Word Cloud Generation
+Extracts enriched GO terms and generates keyword clouds with highlighted biological processes.
 
-Maps UniProt IDs to Ensembl peptide IDs and PaxDb IDs.
+Each script outputs figures or tables into the results/ folder.
 
-Merges with PaxDb abundance data.
-
-Outputs matched protein abundance tables in Excel.
-
-Pie Chart Visualization:
-
-Computes element contributions across subsets.
-
-Plots pie chart of subset contribution using ggplot2.
-
-Chord Diagram of Organ Differences:
-
-Computes pairwise differences for AC sites across organs.
-
-Plots chord diagram using circlize.
-
-Word Cloud Generation:
-
-Generates word cloud from GO terms or text elements.
-
-Can highlight specific keywords.
-
-Outputs PDF figure.
-
-All scripts are designed to read input from data/ and save outputs in results/.
 Outputs
 
----
+All results (PDFs, PNGs, tables) are saved in the results/ directory.
 
-## Outputs
+File names correspond to the figure or analysis type (e.g., Figure1A_GO_BP.pdf, organ_chord_diagram.pdf).
 
-Excel summary files (results/*.xlsx)
+Citations and References
 
-PDF figures for GO enrichment, pie charts, chord diagrams, and word clouds (results/*.pdf)
+If you use this repository, please cite the following tools:
 
----
+Yu G, Wang LG, Han Y, He QY. (2012). clusterProfiler: an R package for comparing biological themes among gene clusters. OMICS: A Journal of Integrative Biology, 16(5), 284–287.
 
-## References
+Wang M, Herrmann CJ, Simonovic M, Szklarczyk D, von Mering C. (2015). PaxDb, a database of protein abundance averages across all three domains of life. Nature Biotechnology, 33(1), 117–118.
 
-Yu, G., Wang, L.G., Han, Y., et al. (2012). clusterProfiler: An R Package for Comparing Biological Themes among Gene Clusters. OMICS: A Journal of Integrative Biology, 16(5), 284-287. DOI: 10.1089/omi.2011.0118
+Gu Z, Gu L, Eils R, Schlesner M, Brors B. (2014). circlize implements and enhances circular visualization in R. Bioinformatics, 30(19), 2811–2812.
 
-Wang, M., Herrmann, C.J., Simonovic, M., et al. (2015). Version 4.0 of PaxDb: Protein Abundance Data, Integrated Across Model Organisms, Tissues, and Cell-Lines. Proteomics, 15(18), 3163-3168. DOI: 10.1002/pmic.201400441
-
-Gu, Z., et al. (2014). circlize Implements and Enhances Circular Visualization in R. Bioinformatics, 30(19), 2811-2812. DOI: 10.1093/bioinformatics/btu393
-
-Fellows, I. (2018). wordcloud: Word Clouds. R package version 2.6. CRAN: wordcloud
-
-Notes
-
-Ensure R working directory is set to the repository root.
-
-All scripts assume input data in data/ and will automatically save results to results/.
+Fellows I. (2018). wordcloud: Word Clouds. R package version 2.6, CRAN.
